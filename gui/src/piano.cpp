@@ -74,7 +74,7 @@ Piano::Piano(ChartCanvas *parent) {
 
   m_hover_icon_last = -1;
   m_hover_last = -1;
-  m_brounded = false;
+  m_brounded = true;  // Modern rounded pill-style keys
   m_bBusy = false;
   m_gotPianoDown = false;
 
@@ -130,7 +130,9 @@ void Piano::Paint(int y, ocpnDC &dc, wxDC *shapeDC) {
 
   int nKeys = m_composite_array.size();
 
-  wxPen ppPen(GetGlobalColor("CHBLK"), 1, wxPENSTYLE_SOLID);
+  // Modern flat styling: subtle thin border instead of heavy outline
+  wxColour borderCol = GetGlobalColor("GREY1");
+  wxPen ppPen(borderCol, 1, wxPENSTYLE_SOLID);
   dc.SetPen(ppPen);
 
   for (int i = 0; i < nKeys; i++) {
@@ -167,11 +169,16 @@ void Piano::Paint(int y, ocpnDC &dc, wxDC *shapeDC) {
     box.y += y;
 
     if (m_brounded) {
-      dc.DrawRoundedRectangle(box.x, box.y, box.width, box.height,
-                              box.height / 5);
+      // Modern: add slight inset for visual key separation, larger radius
+      int inset = 1;
+      wxRect insetBox(box.x + inset, box.y + inset, box.width - 2 * inset,
+                      box.height - 2 * inset);
+      int radius = insetBox.height / 3;  // More rounded than original /5
+      dc.DrawRoundedRectangle(insetBox.x, insetBox.y, insetBox.width,
+                              insetBox.height, radius);
       if (shapeDC)
-        shapeDC->DrawRoundedRectangle(box.x, box.y, box.width, box.height,
-                                      box.height / 5);
+        shapeDC->DrawRoundedRectangle(insetBox.x, insetBox.y, insetBox.width,
+                                      insetBox.height, radius);
     } else {
       dc.DrawRectangle(box.x, box.y, box.width, box.height);
       if (shapeDC) shapeDC->DrawRectangle(box);
@@ -250,7 +257,7 @@ void Piano::BuildGLTexture() {
 
   m_ref = h;
   m_pad = h / 7;  // spacing between buttons
-  m_radius = h / 4;
+  m_radius = h / 3;  // More rounded for modern pill-shaped keys
   m_texPitch = ((2 * m_ref) + (2 * m_pad));
 
   m_tex_piano_height = h;
@@ -280,8 +287,8 @@ void Piano::BuildGLTexture() {
   nominal_line_width_pix *= OCPN_GetWinDIPScaleFactor();
   nominal_line_width_pix = wxMax(1.0, nominal_line_width_pix);
 
-  // draw the needed rectangles
-  wxPen ppPen(GetGlobalColor("CHBLK"), nominal_line_width_pix,
+  // draw the needed rectangles - subtle border for modern flat styling
+  wxPen ppPen(GetGlobalColor("GREY1"), nominal_line_width_pix,
               wxPENSTYLE_SOLID);
   dc.SetPen(ppPen);
   for (unsigned int b = 0; b < (sizeof brushes) / (sizeof *brushes); b++) {

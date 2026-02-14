@@ -766,6 +766,21 @@ void MUIBar::Init() {
   m_texture = 0;
   m_end_margin = m_parentCanvas->GetCharWidth() / 2;
   m_scale = 0;
+
+  // Auto-fade: start fully visible, fade out after 5s of inactivity
+  m_opacity = 1.0f;
+  m_targetOpacity = 1.0f;
+  m_mouseNear = false;
+
+  m_fadeTimer.SetOwner(this, MUI_FADE_TIMER);
+  m_inactivityTimer.SetOwner(this, MUI_INACTIVITY_TIMER);
+
+  Bind(wxEVT_TIMER, &MUIBar::OnFadeTimerEvent, this, MUI_FADE_TIMER);
+  Bind(wxEVT_TIMER, &MUIBar::OnInactivityTimerEvent, this,
+       MUI_INACTIVITY_TIMER);
+
+  // Start the inactivity countdown
+  m_inactivityTimer.Start(5000, wxTIMER_ONE_SHOT);
 }
 
 void MUIBar::SetColorScheme(ColorScheme cs) {
@@ -798,6 +813,30 @@ bool MUIBar::MouseEvent(wxMouseEvent& event) {
 
   //    Check the regions
   wxRect r = wxRect(m_screenPos, m_size);
+
+  // Auto-fade: expand the hit region slightly for proximity detection
+  wxRect proximityRect = r;
+  proximityRect.Inflate(r.width / 3, r.height / 3);
+
+  if (proximityRect.Contains(x, y)) {
+    // Mouse is near the bar — fade in and reset inactivity timer
+    if (!m_mouseNear || m_opacity < 1.0f) {
+      m_mouseNear = true;
+      m_targetOpacity = 1.0f;
+      m_fadeTimer.Start(30, wxTIMER_CONTINUOUS);
+    }
+    // Reset the inactivity countdown
+    m_inactivityTimer.Stop();
+    m_inactivityTimer.Start(5000, wxTIMER_ONE_SHOT);
+  } else {
+    if (m_mouseNear) {
+      m_mouseNear = false;
+      // Restart inactivity countdown when mouse leaves proximity
+      m_inactivityTimer.Stop();
+      m_inactivityTimer.Start(3000, wxTIMER_ONE_SHOT);
+    }
+  }
+
   if (r.Contains(x, y)) {
     // Check for tooltip display on hover/move events
     if (event.Moving() || event.Entering()) {
@@ -1270,22 +1309,32 @@ wxBitmap& MUIBar::CreateBitmap(double displayScale) {
 void MUIBar::DrawGL(ocpnDC& gldc, double displayScale) {
 #ifdef ocpnUSE_GL
 
+  // Semi-transparent background for modern overlay appearance
+  // Apply auto-fade opacity on top of the base 78% background transparency
   wxColour backColor = GetBackgroundColor();
-  gldc.SetBrush(wxBrush(backColor));
-  gldc.SetPen(wxPen(backColor));
+  unsigned char baseAlpha = 200;  // ~78% base opacity
+  unsigned char fadedAlpha =
+      static_cast<unsigned char>(baseAlpha * m_opacity);
+  wxColour semiTransBack(backColor.Red(), backColor.Green(), backColor.Blue(),
+                         fadedAlpha);
+  gldc.SetBrush(wxBrush(semiTransBack));
+  gldc.SetPen(wxPen(semiTransBack));
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   wxRect r = wxRect(m_screenPos, m_size);
   if (m_orientation == wxHORIZONTAL)
     gldc.DrawRoundedRectangle(
         (r.x - m_end_margin / 2) * displayScale, (r.y - 1) * displayScale,
         (r.width + m_end_margin) * displayScale, (r.height + 2) * displayScale,
-        (m_end_margin * 1) * displayScale);
+        (m_end_margin * 1.5) * displayScale);
   else
     gldc.DrawRoundedRectangle((r.x - 1) * displayScale,
                               (r.y - m_end_margin / 2) * displayScale,
                               (r.width + 2) * displayScale,
                               (r.height + 2 * m_end_margin) * displayScale,
-                              (m_end_margin * 1.5) * displayScale);
+                              (m_end_margin * 2) * displayScale);
 
   int width = m_size.x;
   int height = m_size.y;
@@ -1309,19 +1358,27 @@ void MUIBar::DrawGL(ocpnDC& gldc, double displayScale) {
     glBindTexture(g_texture_rectangle_format, m_texture);
   }
 
-  // fill texture data
+  // fill texture data -- make background pixels transparent so only
+  // icons/text are composited over the semi-transparent rounded rect
   if (m_bitmap.IsOk()) {
     wxImage image = m_bitmap.ConvertToImage();
     if (image.IsOk()) {
       unsigned char* d = image.GetData();
       if (d) {
         unsigned char* e = new unsigned char[4 * width * height];
+        unsigned char bgR = backColor.Red();
+        unsigned char bgG = backColor.Green();
+        unsigned char bgB = backColor.Blue();
         for (int y = 0; y < height; y++)
           for (int x = 0; x < width; x++) {
             int i = y * width + x;
             memcpy(e + 4 * i, d + 3 * i, 3);
-            e[4 * i + 3] =
-                255;  // d[3*i + 2] == 255 ? 0:255; //255 - d[3 * i + 2];
+            // Make background-colored pixels fully transparent
+            if (d[3 * i] == bgR && d[3 * i + 1] == bgG &&
+                d[3 * i + 2] == bgB)
+              e[4 * i + 3] = 0;
+            else
+              e[4 * i + 3] = 255;
           }
         glTexImage2D(g_texture_rectangle_format, 0, GL_RGBA, width, height, 0,
                      GL_RGBA, GL_UNSIGNED_BYTE, e);
@@ -1332,11 +1389,16 @@ void MUIBar::DrawGL(ocpnDC& gldc, double displayScale) {
     }
   }
 
-  // Render the texture
+  // Render the texture with auto-fade opacity applied
   if (m_texture) {
     glEnable(g_texture_rectangle_format);
     glBindTexture(g_texture_rectangle_format, m_texture);
     glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Modulate texture alpha by the current fade opacity
+    glColor4f(1.0f, 1.0f, 1.0f, m_opacity);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     int x0 = m_screenPos.x, x1 = x0 + width;
     int y0 = m_screenPos.y - 0, y1 = y0 + height;
@@ -1380,6 +1442,10 @@ void MUIBar::DrawGL(ocpnDC& gldc, double displayScale) {
     glDisable(g_texture_rectangle_format);
     glBindTexture(g_texture_rectangle_format, 0);
     glDisable(GL_BLEND);
+
+    // Restore GL state
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   }
 #endif
 
@@ -1388,7 +1454,19 @@ void MUIBar::DrawGL(ocpnDC& gldc, double displayScale) {
 
 void MUIBar::DrawDC(ocpnDC& dc, double displayScale) {
   CreateBitmap(1.0);
-  dc.DrawBitmap(m_bitmap, m_screenPos.x, m_screenPos.y, false);
+  if (m_bitmap.IsOk() && m_opacity < 1.0f) {
+    // Apply fade opacity for the DC rendering path
+    wxImage img = m_bitmap.ConvertToImage();
+    if (!img.HasAlpha()) img.InitAlpha();
+    unsigned char* alpha = img.GetAlpha();
+    int total = img.GetWidth() * img.GetHeight();
+    for (int i = 0; i < total; i++)
+      alpha[i] = static_cast<unsigned char>(alpha[i] * m_opacity);
+    wxBitmap fadedBmp(img);
+    dc.DrawBitmap(fadedBmp, m_screenPos.x, m_screenPos.y, true);
+  } else {
+    dc.DrawBitmap(m_bitmap, m_screenPos.x, m_screenPos.y, false);
+  }
 }
 
 void MUIBar::ResetCanvasOptions() {
@@ -1590,4 +1668,40 @@ double getValue(int animationType, double t) {
   }
 
   return value;
+}
+
+//------------------------------------------------------------------------------
+//    MUI Bar Auto-Fade Support
+//------------------------------------------------------------------------------
+
+void MUIBar::OnInactivityTimerEvent(wxTimerEvent& event) {
+  // After inactivity period, start fading to idle opacity
+  if (!m_mouseNear) {
+    m_targetOpacity = 0.25f;  // Fade to 25% when idle
+    m_fadeTimer.Start(30, wxTIMER_CONTINUOUS);  // ~33fps smooth fade
+  }
+}
+
+void MUIBar::OnFadeTimerEvent(wxTimerEvent& event) {
+  float fadeSpeed = 0.05f;  // Opacity change per tick
+
+  if (m_opacity < m_targetOpacity) {
+    m_opacity += fadeSpeed;
+    if (m_opacity >= m_targetOpacity) {
+      m_opacity = m_targetOpacity;
+      m_fadeTimer.Stop();
+    }
+  } else if (m_opacity > m_targetOpacity) {
+    m_opacity -= fadeSpeed;
+    if (m_opacity <= m_targetOpacity) {
+      m_opacity = m_targetOpacity;
+      m_fadeTimer.Stop();
+    }
+  } else {
+    m_fadeTimer.Stop();
+    return;
+  }
+
+  // Request a repaint from the parent canvas
+  if (m_parentCanvas) m_parentCanvas->Refresh(false);
 }

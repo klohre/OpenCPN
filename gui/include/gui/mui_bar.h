@@ -33,7 +33,9 @@
 //   constants
 //----------------------------------------------------------------------------
 
-enum { ID_MUI_MENU = 21500 };
+enum { ID_MUI_MENU = 21500,
+       MUI_FADE_TIMER = 21501,
+       MUI_INACTIVITY_TIMER = 21502 };
 
 /**
  * Enumeration for animation types
@@ -69,6 +71,8 @@ public:
   ~MUIBar();
 
   void onCanvasOptionsAnimationTimerEvent(wxTimerEvent &event);
+  void OnFadeTimerEvent(wxTimerEvent &event);
+  void OnInactivityTimerEvent(wxTimerEvent &event);
 
   void SetBestPosition();
   void UpdateDynamicValues();
@@ -85,6 +89,7 @@ public:
 
   bool MouseEvent(wxMouseEvent &event);
   void PushCanvasOptions();
+  float GetOpacity() const { return m_opacity; }
 
   wxPoint m_screenPos;
   wxSize m_size;
@@ -142,6 +147,13 @@ private:
   int m_end_margin;
   wxBitmap m_bitmap;
   int m_scale;
+
+  // Auto-fade members for modern overlay behavior
+  float m_opacity;           ///< Current opacity 0.0 (hidden) to 1.0 (fully visible)
+  float m_targetOpacity;     ///< Target opacity for fade animation
+  wxTimer m_fadeTimer;       ///< Timer driving smooth fade animation
+  wxTimer m_inactivityTimer; ///< Timer to start fade-out after inactivity
+  bool m_mouseNear;          ///< True if mouse is near the MUI bar area
 };
 
 #endif
