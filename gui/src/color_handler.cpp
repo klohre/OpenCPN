@@ -59,72 +59,31 @@ wxColour GetGlobalColor(wxString colorName) {
 wxColour GetDialogColor(DialogColor color) {
   wxColour col = *wxRED;
 
-  bool bUseSysColors = false;
-  bool bIsDarkMode = false;
-#ifdef __WXOSX__
-  if (wxPlatformInfo::Get().CheckOSVersion(10, 14)) bUseSysColors = true;
-#endif
-#ifdef __WXGTK__
-  bUseSysColors = true;
-#endif
-
-  if (bUseSysColors) {
-    wxColour bg = wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE);
-    if (bg.Red() < 128) {
-      bIsDarkMode = true;
-    }
-  }
-
+  // Always use OpenCPN's own color scheme for consistent dark theme.
+  // The color tables in user_colors.cpp define a cohesive dark palette
+  // across DAY/DUSK/NIGHT modes.
   switch (color) {
     case DLG_BACKGROUND:
-      if (bUseSysColors && bIsDarkMode) {
-        col = wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE);
-      } else {
-        col = GetGlobalColor("DILG0");
-      }
+      col = GetGlobalColor("DILG0");
       break;
     case DLG_SELECTED_BACKGROUND:
-      if (bUseSysColors && bIsDarkMode) {
-        col = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
-      } else {
-        col = GetGlobalColor("DILG1");
-      }
+      col = GetGlobalColor("DILG1");
       break;
     case DLG_UNSELECTED_BACKGROUND:
-      if (bUseSysColors && bIsDarkMode) {
-        col = wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE);
-      } else {
-        col = GetGlobalColor("DILG0");
-      }
+      col = GetGlobalColor("DILG0");
       break;
     case DLG_ACCENT:
     case DLG_SELECTED_ACCENT:
-      if (bUseSysColors && bIsDarkMode) {
-        col = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-      } else {
-        col = GetGlobalColor("DILG3");
-      }
+      col = GetGlobalColor("DILG3");
       break;
     case DLG_UNSELECTED_ACCENT:
-      if (bUseSysColors && bIsDarkMode) {
-        col = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-      } else {
-        col = GetGlobalColor("DILG1");
-      }
+      col = GetGlobalColor("DILG1");
       break;
     case DLG_TEXT:
-      if (bUseSysColors && bIsDarkMode) {
-        col = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
-      } else {
-        col = GetGlobalColor("DILG3");
-      }
+      col = GetGlobalColor("DILG3");
       break;
     case DLG_HIGHLIGHT:
-      if (bUseSysColors && bIsDarkMode) {
-        col = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
-      } else {
-        col = GetGlobalColor("UIBCK");
-      }
+      col = GetGlobalColor("UINFB");  // Teal accent for highlights
       break;
   }
   return col;

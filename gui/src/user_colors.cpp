@@ -14,190 +14,179 @@ ColorScheme GetColorScheme() { return global_color_scheme; }
 
 static const char *const usercolors[] = {
     //======================================================================
-    // Table:DAY - Bright daylight color scheme (full visibility mode)
+    // Table:DAY - Modern dark theme inspired by Raymarine Axiom / B&G Zeus
+    // Dark charcoal backgrounds with ocean-teal accent (#00BCD4)
+    // Designed for maximum chart visibility and reduced eye strain
     //======================================================================
     "Table:DAY",
 
-    // Standard palette colors - general purpose UI elements
-    "GREEN1;120;255;120;", "GREEN2; 45;150; 45;", "GREEN3;200;220;200;",
-    "GREEN4;  0;255;  0;", "GREEN5;170;254;  0;", "BLUE1; 170;170;255;",
-    "BLUE2;  45; 45;170;", "BLUE3;   0;  0;255;", "GREY1; 200;200;200;",
-    "GREY2; 230;230;230;", "RED1;  220;200;200;", "YELO1; 243;229; 47;",
-    "YELO2; 128; 80;  0;", "TEAL1;   0;128;128;",
+    // Standard palette colors - adjusted for dark background visibility
+    "GREEN1; 80;220; 80;", "GREEN2; 45;170; 45;", "GREEN3; 40; 58; 40;",
+    "GREEN4;  0;230;  0;", "GREEN5;150;230;  0;", "BLUE1; 100;130;220;",
+    "BLUE2;  55; 75;190;", "BLUE3;  40; 80;255;", "GREY1;  58; 62; 70;",
+    "GREY2;  44; 48; 56;", "RED1;   80; 44; 44;", "YELO1; 243;229; 47;",
+    "YELO2; 180;120; 20;", "TEAL1;   0;188;212;",
 
     // Basic UI colors
-    "UBLCK;   0;  0;  0;",  // Universal black for text/lines
-    "UWHIT; 255;255;255;",  // Universal white for backgrounds
-    "URED;  255;  0;  0;",  // Own vessel color, AIS targets, predictor lines
-    "UGREN;   0;255;  0;",  // Universal green for general purpose green
-    "COMPT; 245;247;244",   // Compass rose background/details
+    "UBLCK; 212;216;224;",  // Text/lines: light on dark background
+    "UWHIT;  30; 32; 40;",  // Backgrounds: dark charcoal
+    "URED;  255; 82; 82;",  // Own vessel: bright red, visible on dark
+    "UGREN;  76;217; 100;",  // Green: slightly muted for dark bg
+    "COMPT;  44; 48; 56",   // Compass rose background: dark
 
-// Dialog system colors
-#ifdef __WXOSX__
-    "DILG0; 255;255;255;",  // Dialog window background (macOS)
-#else
-    "DILG0; 238;239;242;",  // Dialog window background (other platforms)
-#endif
-    "DILG1; 212;208;200;",  // Background color for selected items
-    "DILG2; 255;255;255;",  // Control backgrounds for text boxes and input
-                            // fields
-    "DILG3;   0;  0;  0;",  // Dialog text color in dialogs and controls
+    // Dialog system colors - dark theme for all platforms
+    "DILG0;  30; 32; 40;",  // Dialog window background: dark charcoal
+    "DILG1;  40; 44; 52;",  // Selected items background: slightly lighter
+    "DILG2;  24; 26; 32;",  // Control/input field background: deepest dark
+    "DILG3; 212;216;224;",  // Dialog text: light grey for contrast
     /**
      * Text color optimized for progressively darker backgrounds (pairs with
      * DILG0). Gets progressively lighter as background darkens to maintain
      * contrast. Ideal for tooltips, overlays, and any text over DILG0
      * background. */
-    "DILG4;   0;  0;  0;",
-    "UITX1;   0;  0;  0;",  // Menu text color
+    "DILG4; 200;204;212;",
+    "UITX1; 180;184;192;",  // Menu text: slightly dimmer light grey
 
     // Chart and information display colors
-    "CHGRF; 163; 180; 183;",  // Chart gray foreground (grid lines, secondary
-                              // text)
-    "CHYLW; 244; 218;  72;",  // Chart yellow (AIS name invalid, warnings)
-    "CHWHT; 212; 234; 238;",  // Chart white (AIS outlines, contrast elements)
+    "CHGRF; 100;110;120;",  // Chart gray foreground: medium grey on dark
+    "CHYLW; 255;214;  0;",  // Chart yellow: brighter for dark bg visibility
+    "CHWHT; 180;200;210;",  // Chart white: soft white for dark bg
 
-    // Information status colors
-    "UINFM; 197;  69; 195;",  // Magenta - special indicators, chart magenta
-                              // features
-    "UINFG; 104; 228;  86;",  // Green - status indicators, tide/current
-                              // graphics
-    "UINFR; 241;  84; 105;",  // Red - alerts, errors, danger markers
-    "UINFF; 125; 137; 140;",  // Default foreground - general UI elements
-    "SHIPS;   7;   7;   7;",  // Other vessels/AIS target fills
+    // Information status colors - vibrant for dark background
+    "UINFM; 220; 100;220;",  // Magenta: brighter for dark bg
+    "UINFG;  76; 217;100;",  // Green: vibrant status green
+    "UINFR; 255;  82; 82;",  // Red: bright alert red
+    "UINFF; 140;150;160;",  // Default foreground: medium grey
+    "SHIPS; 160;170;180;",  // AIS target fills: visible on dark
 
     // Route and navigation colors
-    "UDKRD; 124; 16;  0;",  // Dark red variant - reduced visibility alternative
-                            // to URED
-    "UARTE; 200;  0;  0;",  // Active route color (bright red in day mode)
+    "UDKRD; 180; 40; 30;",  // Dark red variant: visible on dark bg
+    "UARTE; 255; 60; 60;",  // Active route: bright red on dark
 
     // Chart data and measurement colors
-    "NODTA; 163; 180; 183;",  // No data available areas
-    "CHBLK;   7;   7;   7;",  // Chart black - text, lines, piano keys
-    "SNDG1; 125; 137; 140;",  // Sounding text (depth numbers) - primary
-    "SNDG2;   7;   7;   7;",  // Sounding text (depth numbers) - secondary
-    "SCLBR; 235; 125;  54;",  // Scale bar markings and text
+    "NODTA;  50; 55; 65;",   // No data areas: dark grey
+    "CHBLK; 200;210;220;",   // Chart text/lines: light on dark
+    "SNDG1; 140;150;160;",   // Sounding text primary: medium grey
+    "SNDG2; 180;190;200;",   // Sounding text secondary: lighter grey
+    "SCLBR;   0;188;212;",   // Scale bar: teal accent color
 
     // UI framework colors
-    "UIBDR; 125; 137; 140;",  // UI borders, status bar background
-    "UIBCK; 212; 234; 238;",  // Highlight backgrounds, info windows
-    "UINFB;  58; 120; 240;",  // Information blue - active/selected states, tide
-                              // markers
-    "UINFD;   7;   7;   7;",  // Information dark - borders, inactive elements
-    "UINFO; 235; 125;  54;",  // Information orange - warnings, highlights
+    "UIBDR;  55; 60; 70;",   // UI borders: subtle dark border
+    "UIBCK;  40; 44; 52;",   // Highlight backgrounds: dark surface
+    "UINFB;   0;188;212;",   // Information blue: teal accent for active states
+    "UINFD;  70; 76; 86;",   // Information dark: medium dark borders
+    "UINFO; 255;171; 64;",   // Information orange: warm accent
 
     // Route planning colors
-    "PLRTE; 220;  64;  37;",  // Planned route color (not yet active)
-    "CHMGD; 197; 69; 195;",  // Chart magenta - special chart features, AIS MMSI
-                             // text
+    "PLRTE; 255;100; 60;",  // Planned route: warm orange-red
+    "CHMGD; 220;100;220;",  // Chart magenta: bright on dark
 
-    // Dashboard instrument colors
-    "DASHB; 255;255;255;",  // Dashboard instrument background
-    "DASHL; 175;175;175;",  // Dashboard instrument labels and graduations
-    "DASHF;  50; 50; 50;",  // Dashboard foreground text and indicators
-    "DASHR; 200;  0;  0;",  // Dashboard red indicators (alarms, danger zones)
-    "DASHG;   0;200;  0;",  // Dashboard green indicators (normal status)
-    "DASHN; 200;120;  0;",  // Dashboard needle/pointer color
-    "DASH1; 204;204;255;",  // Dashboard graphic elements - primary
-    "DASH2; 122;131;172;",  // Dashboard graphic elements - secondary
-    "COMP1; 211;211;211;",  // Compass window background
+    // Dashboard instrument colors - dark panel, light readouts (B&G style)
+    "DASHB;  26; 28; 36;",  // Dashboard background: deep dark
+    "DASHL;  80; 88;100;",  // Dashboard labels: subtle grey
+    "DASHF; 220;225;235;",  // Dashboard foreground: bright white text
+    "DASHR; 255; 82; 82;",  // Dashboard red: bright alarm
+    "DASHG;  76;217;100;",  // Dashboard green: healthy status
+    "DASHN;   0;188;212;",  // Dashboard needle: teal accent
+    "DASH1;  60; 70;100;",  // Dashboard graphics primary: dark blue-grey
+    "DASH2;  45; 52; 72;",  // Dashboard graphics secondary: deeper
+    "COMP1;  34; 38; 46;",  // Compass window background: dark
 
     // Window and canvas elements
-    "GREY3;  40; 40; 40;",     // MUI toolbar background
-    "BLUE4; 100;100;200;",     // Canvas focus indicator bar
-    "VIO01; 171; 33;141;",     // Violet - vector chart special elements
-    "VIO02; 209;115;213;",     // Violet variant - vector chart features
-    "BLUEBACK; 212;234;238;",  // Deep water background color for basemap
-    "LANDBACK; 201;185;122;",  // Land mass background color for basemap
+    "GREY3;  22; 24; 30;",     // MUI toolbar background: near-black
+    "BLUE4;   0;150;180;",     // Canvas focus bar: teal variant
+    "VIO01; 190; 80;180;",     // Violet: brighter for dark bg
+    "VIO02; 220;130;220;",     // Violet variant: lighter
+    "BLUEBACK; 212;234;238;",  // Deep water: preserve chart rendering
+    "LANDBACK; 201;185;122;",  // Land mass: preserve chart rendering
 
     //======================================================================
-    // Table:DUSK - Reduced brightness for twilight conditions
-    // Colors defined above are automatically dimmed for dusk visibility
+    // Table:DUSK - Reduced brightness twilight, darker than DAY dark theme
+    // Further dimmed colors for transition to night vision
     //======================================================================
-    "Table:DUSK", "GREEN1; 60;128; 60;", "GREEN2; 22; 75; 22;",
-    "GREEN3; 80;100; 80;", "GREEN4;  0;128;  0;", "BLUE1;  80; 80;160;",
-    "BLUE2;  30; 30;120;", "BLUE3;   0;  0;128;", "GREY1; 100;100;100;",
-    "GREY2; 128;128;128;", "RED1;  150;100;100;", "UBLCK;   0;  0;  0;",
-    "UWHIT; 255;255;255;", "URED;  120; 54; 11;", "UGREN;  35;110; 20;",
-    "YELO1; 120;115; 24;", "YELO2;  64; 40;  0;", "TEAL1;   0; 64; 64;",
-    "GREEN5; 85;128; 0;", "COMPT; 124;126;121",
+    "Table:DUSK", "GREEN1; 40;110; 40;", "GREEN2; 22; 85; 22;",
+    "GREEN3; 25; 35; 25;", "GREEN4;  0;115;  0;", "BLUE1;  50; 65;110;",
+    "BLUE2;  28; 38; 95;", "BLUE3;  20; 40;128;", "GREY1;  38; 42; 48;",
+    "GREY2;  30; 34; 40;", "RED1;   50; 28; 28;", "UBLCK; 140;145;155;",
+    "UWHIT;  20; 22; 28;", "URED;  120; 54; 11;", "UGREN;  35;110; 20;",
+    "YELO1; 120;115; 24;", "YELO2;  90; 60;  0;", "TEAL1;   0; 94;106;",
+    "GREEN5; 75;115; 0;", "COMPT;  30; 33; 38",
 
-    "CHGRF;  41; 46; 46;", "UINFM;  58; 20; 57;", "UINFG;  35; 76; 29;",
-    "UINFF;  41; 46; 46;", "UINFR;  80; 28; 35;", "SHIPS;  71; 78; 79;",
-    "CHYLW;  81; 73; 24;", "CHWHT;  71; 78; 79;",
+    "CHGRF;  60; 66; 72;", "UINFM; 110; 50;108;", "UINFG;  38;109; 50;",
+    "UINFF;  70; 76; 82;", "UINFR; 128; 41; 41;", "SHIPS;  90;100;110;",
+    "CHYLW; 128;109; 24;", "CHWHT;  90;100;105;",
 
-    "DILG0; 110;110;110;",  // Dialog Background
-    "DILG1; 110;110;110;",  // Dialog Background
-    "DILG2;   0;  0;  0;",  // Control Background
-    "DILG3; 130;130;130;",  // Text
-    "DILG4;   0;  0;  0;",
-    "UITX1;  41; 46; 46;",  // Menu text color
-    "UDKRD;  80;  0;  0;",  // Dark red variant - reduced visibility alternative
-                            // to URED
-    "UARTE;  64; 64; 64;",  // Active route color (grey for dusk/night modes)
+    "DILG0;  22; 24; 30;",   // Dialog Background: deeper dark
+    "DILG1;  28; 30; 38;",   // Selected Background
+    "DILG2;  16; 18; 22;",   // Control Background
+    "DILG3; 140;145;155;",   // Text: dimmer than DAY
+    "DILG4; 120;125;135;",
+    "UITX1; 100;106;116;",  // Menu text color
+    "UDKRD;  90; 20; 15;",  // Dark red variant
+    "UARTE; 128; 40; 40;",  // Active route
 
-    "NODTA;  41;  46;  46;", "CHBLK;  54;  60;  61;", "SNDG1;  41;  46;  46;",
-    "SNDG2;  71;  78;  79;", "SCLBR;  75;  38;  19;", "UIBDR;  54;  60;  61;",
-    "UINFB;  19;  40;  80;", "UINFD;  71;  78;  79;", "UINFO;  75;  38;  19;",
-    "PLRTE;  73;  21;  12;", "CHMGD; 74; 58; 81;", "UIBCK; 7; 7; 7;",
+    "NODTA;  30; 34; 40;", "CHBLK; 110;120;130;", "SNDG1;  70; 76; 82;",
+    "SNDG2;  90;100;105;", "SCLBR;   0; 94;106;", "UIBDR;  35; 40; 48;",
+    "UINFB;   0; 94;106;", "UINFD;  45; 50; 58;", "UINFO; 128; 86; 32;",
+    "PLRTE; 128; 50; 30;", "CHMGD; 110; 50;108;", "UIBCK; 16; 18; 22;",
 
-    "DASHB;  77; 77; 77;",  // Dashboard Instr background
-    "DASHL;  54; 54; 54;",  // Dashboard Instr Label
-    "DASHF;   0;  0;  0;",  // Dashboard Foreground
-    "DASHR;  58; 21; 21;",  // Dashboard Red
-    "DASHG;  21; 58; 21;",  // Dashboard Green
-    "DASHN; 100; 50;  0;",  // Dashboard Needle
-    "DASH1;  76; 76;113;",  // Dashboard Illustrations
-    "DASH2;  48; 52; 72;",  // Dashboard Illustrations
-    "COMP1; 107;107;107;",  // Compass Window Background
+    "DASHB;  16; 18; 24;",  // Dashboard Instr background
+    "DASHL;  48; 54; 62;",  // Dashboard Instr Label
+    "DASHF; 140;145;155;",  // Dashboard Foreground
+    "DASHR; 128; 41; 41;",  // Dashboard Red
+    "DASHG;  38;109; 50;",  // Dashboard Green
+    "DASHN;   0; 94;106;",  // Dashboard Needle: dimmed teal
+    "DASH1;  36; 42; 60;",  // Dashboard Illustrations
+    "DASH2;  28; 32; 46;",  // Dashboard Illustrations
+    "COMP1;  22; 24; 30;",  // Compass Window Background
 
-    "GREY3;  20; 20; 20;",  // MUIBar/TB background
-    "BLUE4;  80; 80;160;",  // Canvas Focus Bar
-    "VIO01; 128; 25;108;", "VIO02; 171; 33;141;", "BLUEBACK; 186;213;235;",
+    "GREY3;  14; 16; 20;",  // MUIBar/TB background
+    "BLUE4;   0; 75; 90;",  // Canvas Focus Bar
+    "VIO01; 95; 40; 90;", "VIO02; 110; 65;110;", "BLUEBACK; 186;213;235;",
     "LANDBACK; 201;185;122;",
 
     //======================================================================
-    // Table:NIGHT - Dark adapted colors preserving night vision
-    // Colors are further dimmed and shifted toward red spectrum
+    // Table:NIGHT - Ultra-dim for true night vision preservation
+    // Red-shifted, minimal brightness, preserves dark adaptation
     //======================================================================
-    "Table:NIGHT", "GREEN1; 30; 80; 30;", "GREEN2; 15; 60; 15;",
-    "GREEN3; 12; 23;  9;", "GREEN4;  0; 64;  0;", "BLUE1;  60; 60;100;",
-    "BLUE2;  22; 22; 85;", "BLUE3;   0;  0; 40;", "GREY1;  48; 48; 48;",
-    "GREY2;  32; 32; 32;", "RED1;  100; 50; 50;", "UWHIT; 255;255;255;",
-    "UBLCK;   0;  0;  0;", "URED;   60; 27;  5;", "UGREN;  17; 55; 10;",
-    "YELO1;  60; 65; 12;", "YELO2;  32; 20;  0;", "TEAL1;   0; 32; 32;",
-    "GREEN5; 44; 64; 0;", "COMPT;  48; 49; 51",
-    "DILG0;  80; 80; 80;",     // Dialog Background
-    "DILG1;  80; 80; 80;",     // Dialog Background
-    "DILG2;   0;  0;  0;",     // Control Background
-    "DILG3;  180; 180; 180;",  // Text
-    "DILG4; 220;220;220;",
-    "UITX1;  31; 34; 35;",  // Menu text color
-    "UDKRD;  50;  0;  0;",  // Dark red variant - reduced visibility alternative
-                            // to URED
-    "UARTE;  64; 64; 64;",  // Active route color (grey for dusk/night modes)
+    "Table:NIGHT", "GREEN1; 20; 50; 20;", "GREEN2; 10; 40; 10;",
+    "GREEN3;  8; 14;  6;", "GREEN4;  0; 44;  0;", "BLUE1;  30; 30; 60;",
+    "BLUE2;  14; 14; 55;", "BLUE3;   0;  0; 30;", "GREY1;  24; 26; 30;",
+    "GREY2;  16; 18; 22;", "RED1;   40; 20; 20;", "UWHIT;  12; 14; 18;",
+    "UBLCK;  80; 82; 88;", "URED;   60; 20;  5;", "UGREN;  12; 40;  8;",
+    "YELO1;  50; 48; 10;", "YELO2;  28; 18;  0;", "TEAL1;   0; 24; 28;",
+    "GREEN5; 34; 48; 0;", "COMPT;  16; 18; 22",
+    "DILG0;  12; 14; 18;",     // Dialog Background: near black
+    "DILG1;  18; 20; 24;",     // Selected Background
+    "DILG2;   6;  8; 10;",     // Control Background: deepest
+    "DILG3;  80; 82; 88;",     // Text: dim for night vision
+    "DILG4;  70; 72; 78;",
+    "UITX1;  50; 54; 58;",  // Menu text color
+    "UDKRD;  50;  8;  0;",  // Dark red variant
+    "UARTE;  64; 20; 20;",  // Active route: dim red
 
-    "CHGRF;  16; 18; 18;", "UINFM;  52; 18; 52;", "UINFG;  22; 24;  7;",
-    "UINFF;  31; 34; 35;", "UINFR;  59; 17; 10;", "SHIPS;  37; 41; 41;",
-    "CHYLW;  31; 33; 10;", "CHWHT;  37; 41; 41;",
+    "CHGRF;  28; 32; 36;", "UINFM;  40; 14; 40;", "UINFG;  16; 36; 10;",
+    "UINFF;  40; 44; 48;", "UINFR;  64; 20; 12;", "SHIPS;  50; 55; 60;",
+    "CHYLW;  40; 38; 10;", "CHWHT;  44; 48; 52;",
 
-    "NODTA;   7;   7;   7;", "CHBLK;  31;  34;  35;", "SNDG1;  31;  34;  35;",
-    "SNDG2;  43;  48;  48;", "SCLBR;  52;  28;  12;", "UIBDR;  31;  34;  35;",
-    "UINFB;  21;  29;  69;", "UINFD;  43;  48;  58;", "UINFO;  52;  28;  12;",
-    "PLRTE;  66;  19;  11;", "CHMGD; 52; 18; 52;", "UIBCK; 7; 7; 7;",
+    "NODTA;   8;  10;  12;", "CHBLK;  55;  60;  65;", "SNDG1;  40;  44;  48;",
+    "SNDG2;  50;  55;  58;", "SCLBR;   0;  47;  53;", "UIBDR;  20;  22;  26;",
+    "UINFB;   0;  47;  53;", "UINFD;  28;  32;  38;", "UINFO;  64;  34;  12;",
+    "PLRTE;  64;  22;  12;", "CHMGD; 40; 14; 40;", "UIBCK;  8; 10; 12;",
 
-    "DASHB;   0;  0;  0;",  // Dashboard Instr background
-    "DASHL;  20; 20; 20;",  // Dashboard Instr Label
-    "DASHF;  64; 64; 64;",  // Dashboard Foreground
-    "DASHR;  70; 15; 15;",  // Dashboard Red
-    "DASHG;  15; 70; 15;",  // Dashboard Green
-    "DASHN;  17; 80; 56;",  // Dashboard Needle
-    "DASH1;  48; 52; 72;",  // Dashboard Illustrations
-    "DASH2;  36; 36; 53;",  // Dashboard Illustrations
-    "COMP1;  24; 24; 24;",  // Compass Window Background
+    "DASHB;   6;  8; 10;",  // Dashboard Instr background: near black
+    "DASHL;  24; 26; 30;",  // Dashboard Instr Label
+    "DASHF;  70; 72; 78;",  // Dashboard Foreground: dim
+    "DASHR;  64; 20; 12;",  // Dashboard Red: dim
+    "DASHG;  12; 50; 12;",  // Dashboard Green: dim
+    "DASHN;   0; 47; 53;",  // Dashboard Needle: dim teal
+    "DASH1;  20; 24; 36;",  // Dashboard Illustrations
+    "DASH2;  14; 16; 26;",  // Dashboard Illustrations
+    "COMP1;  10; 12; 16;",  // Compass Window Background
 
-    "GREY3;  10; 10; 10;",  // MUIBar/TB background
-    "BLUE4;  70; 70;140;",  // Canvas Focus Bar
-    "VIO01;  85; 16; 72;", "VIO02; 128; 25;108;", "BLUEBACK; 186;213;235;",
+    "GREY3;   6;  8; 10;",  // MUIBar/TB background: near black
+    "BLUE4;   0; 38; 44;",  // Canvas Focus Bar: dim teal
+    "VIO01;  48; 12; 44;", "VIO02;  64; 20; 60;", "BLUEBACK; 186;213;235;",
     "LANDBACK; 201;185;122;",
 
     "*****"};
